@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.deepsl.hrm.dao.DeptDao">
+
+
+	<select id="save" parameterType="org.deepsl.hrm.domain.Dept">
+		insert into dept_inf (name,remark) values
+		(#{name},#{remark})
+	</select>
+
+	<select id="selectAllDept" resultType="org.deepsl.hrm.domain.Dept">
+		select * from dept_inf
+	</select>
+	
+	<select id="selectByPage" parameterType="hashmap" resultType="org.deepsl.hrm.domain.Dept">
+		select * from dept_inf u
+		<where>
+			<if test="name!=null and username!=''">
+				and u.name = #{name}
+			</if>
+		</where>
+		limit #{size} offset #{firstIndex}
+	</select>
+	
+	<select id="count" resultType="int" parameterType="hashmap">
+		select count(*) from
+		dept_inf u
+		<where>
+			<if test="name!=null and name!=''">
+				and u.name= #{name}
+			</if>
+		</where>
+	</select>
+	
+	<delete id="deleteById" parameterType="int">
+		delete from dept_inf where id = #{id}
+	</delete>
+	
+	
+	<select id="selectById" parameterType="int" resultType="org.deepsl.hrm.domain.Dept">
+		select * from dept_inf where id = #{id}
+	
+	</select>
+	
+	<update id="update" parameterType="org.deepsl.hrm.domain.Dept">
+		update dept_inf set name=#{name},remark=#{remark}
+		where id=#{id}
+	</update>
+	
+</mapper>

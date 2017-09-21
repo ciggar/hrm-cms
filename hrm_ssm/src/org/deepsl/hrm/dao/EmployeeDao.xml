@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.deepsl.hrm.dao.EmployeeDao">
+
+	<resultMap type="org.deepsl.hrm.domain.Employee" id="employeemap">
+		<id column="id" property="id"></id>
+		<result column="name" property="name"/>
+		<result column="phone" property="phone"/>
+		<result column="email" property="email"/>
+		<result column="education" property="education"/>
+		<result column="cardId" property="cardId"/>
+		<result column="address" property="address"/>
+		<result column="createDate" property="createDate"/>
+
+		<association property="job" javaType="org.deepsl.hrm.domain.Job">  
+            <id column="employee_job_id" property="id"/>  
+            <result column="jname" property="name"/>
+			<result column="jremark" property="remark"/>            
+        </association>  
+        
+        <association property="dept" javaType="org.deepsl.hrm.domain.Dept">
+        	<id column="employee_dept_id" property="id"/>
+        	<result column="dname" property="name"/>
+        	<result column="dremark" property="remark"/>
+        </association>
+	</resultMap>
+	
+	<resultMap type="org.deepsl.hrm.domain.Employee" id="selectMap">
+		<id column="id" property="id"></id>
+		<result column="name" property="name"/>
+		<result column="phone" property="phone"/>
+		<result column="email" property="email"/>
+		<result column="education" property="education"/>
+		<result column="cardId" property="cardId"/>
+		<result column="address" property="address"/>
+		<result column="createDate" property="createDate"/>
+		<result column="sex" property="sex"/>
+		<result column="remark" property="remark"/>
+		<result column="tel" property="tel"/>
+		<result column="party" property="party"/>
+		<result column="speciality" property="speciality"/>
+		<result column="postCode" property="postCode"/>
+		<result column="birthday" property="birthday"/>
+		<result column="race" property="race"/>
+		<result column="hobby" property="hobby"/>
+		
+		
+	</resultMap>
+	
+	<select id="save" parameterType="org.deepsl.hrm.domain.Employee">
+		insert into employee_inf (dept_id,job_id,name,card_id,address,post_code,tel,phone,qq_num,email,sex,party,birthday,race,education,SPECIALITY,hobby,remark) values
+		(#{dept.id},#{job.id},#{name},#{cardId},#{address},#{postCode},#{tel},#{phone},#{qqNum},#{email},#{sex},#{party},#{birthday},#{race},#{education},#{speciality},#{hobby},#{remark})
+	</select>
+
+	<select id="selectAllEmployee" resultType="org.deepsl.hrm.domain.Employee">
+		select * from Employee_inf
+	</select>
+	
+	<select id="selectByPage" parameterType="hashmap" resultMap="employeemap">
+		select 
+			u.id,
+			u.dept_id as employee_dept_id,
+			u.job_id as employee_job_id,
+			u.card_id as cardId,
+			u.address,
+			u.name,
+			u.post_code as postCode,
+			u.tel,
+			u.phone,
+			u.QQ_NUM as qqNum,
+			u.email,
+			u.sex,
+			u.party,
+			u.birthday,
+			u.race,
+			u.education,
+			u.speciality,
+			u.hobby,
+			u.remark,
+			u.create_date as createDate,
+			d.`ID` AS did,
+			d.`NAME` AS dname,
+			d.`REMARK` AS dremark,
+			j.`ID` AS jid,
+			j.`NAME` AS jname,
+			j.`REMARK` AS jremark
+
+		from employee_inf u inner join 
+			job_inf as j,dept_inf as d
+		<where>
+			u.job_id=j.id and u.dept_id=d.id
+			<if test="employee.name!=null and employee.name!=''">
+				and u.name= #{employee.name}
+			</if>
+			<if test="employee.cardId!=null and employee.cardId!=''">
+				and u.card_id= #{employee.cardId}
+			</if>
+			
+			<if test="employee.phone!=null and employee.phone!=''">
+				and u.phone= #{employee.phone}
+			</if>
+			
+			<if test="dept_id!=null and dept_id!=0">
+				and u.dept_id= #{dept_id}
+			</if>
+			
+			<if test="employee.sex!=null and employee.sex!=''">
+				and u.sex= #{employee.sex}
+			</if>
+			
+			<if test="job_id!=null and job_id!=0">
+				and u.job_id= #{job_id}
+			</if>
+		</where>
+		limit #{size} offset #{firstIndex}
+	</select>
+	
+	<select id="count" resultType="int" parameterType="hashmap">
+		select count(*) from
+		Employee_inf u 
+		<where>
+			<if test="employee.name!=null and employee.name!=''">
+				and u.name= #{employee.name}
+			</if>
+			<if test="employee.cardId!=null and employee.cardId!=''">
+				and u.card_id= #{employee.cardId}
+			</if>
+			
+			<if test="employee.phone!=null and employee.phone!=''">
+				and u.phone= #{employee.phone}
+			</if>
+			
+			<if test="dept_id!=null and dept_id!=0">
+				and u.dept_id= #{dept_id}
+			</if>
+			
+			<if test="employee.sex!=null and employee.sex!=''">
+				and u.sex= #{employee.sex}
+			</if>
+			
+			<if test="job_id!=null and job_id!=0">
+				and u.job_id= #{job_id}
+			</if>
+			
+		</where>
+	</select>
+	
+	<delete id="deleteById" parameterType="int">
+		delete from Employee_inf where id = #{id}
+	</delete>
+	
+	
+	<select id="selectById" parameterType="int" resultMap="selectMap">
+		select 
+			u.id,
+			u.card_id as cardId,
+			u.address,
+			u.name,
+			u.post_code as postCode,
+			u.tel,
+			u.phone,
+			u.QQ_NUM as qqNum,
+			u.email,
+			u.sex,
+			u.party,
+			u.birthday,
+			u.race,
+			u.education,
+			u.speciality,
+			u.hobby,
+			u.remark,
+			u.create_date as createDate
+		from employee_inf u 
+		<where>
+		u.id=#{id}
+		</where>
+	</select>
+	
+	<update id="update" parameterType="org.deepsl.hrm.domain.Employee">
+		update Employee_inf set 
+			name=#{name},
+			remark=#{remark},
+			dept_id=#{dept.id},
+			job_id=#{job.id},
+			card_id=#{cardId},
+			address=#{address},
+			post_code=#{postCode},
+			tel=#{tel},
+			phone=#{phone},
+			qq_num=#{qqNum},
+			email=#{email},
+			sex=#{sex},
+			party=#{party},
+			birthday=#{birthday},
+			race=#{race},
+			education=#{education},
+			speciality=#{speciality},
+			hobby=#{hobby}
+			
+		where id=#{id}
+	</update>
+	
+</mapper>

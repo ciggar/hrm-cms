@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.deepsl.hrm.dao.DocumentDao">
+
+
+	<resultMap type="org.deepsl.hrm.domain.Document" id="fileMap">
+		<id column="id" property="id"/>
+		<result column="title" property="title"/>
+		<result column="filename" property="fileName"/>
+		<result column="remark" property="remark"/>
+		<result column="create_date" property="createDate"/>
+		
+		
+		<association property="user" javaType="org.deepsl.hrm.domain.User">  
+            <id column="user_id" property="id"/>  
+            <result column="username" property="username"/>
+			<result column="loginname" property="loginname"/>            
+        </association>  
+	</resultMap>
+	
+	
+	<select id="save" parameterType="org.deepsl.hrm.domain.Document">
+		insert into document_inf (title,filename,remark,user_id) values
+		(#{title},#{fileName},#{remark},#{user.id})
+	</select>
+	
+	<select id="count" resultType="int" parameterType="hashmap">
+		select count(*) from
+		document_inf u
+		<where>
+			<if test="title!=null and title!=''">
+				and u.title like '%${title}%'
+			</if>
+		</where>
+	</select>
+	
+	<select id="selectByPage" parameterType="hashmap" resultMap="fileMap">
+		select 
+			d.id,
+			d.title,
+			d.filename,
+			d.remark,
+			d.create_date,
+			d.user_id,
+			u.username,
+			u.loginname
+		
+		 from document_inf d inner join user_inf u
+		<where>
+			and d.user_id=u.id
+			<if test="title!=null and title!=''">
+				and title like '%${title}%'
+			</if>
+		</where>
+		limit #{size} offset #{firstIndex}
+	</select>
+	
+	<select id="selectById" parameterType="int" resultMap="fileMap">
+		select 
+			d.id,
+			d.title,
+			d.filename,
+			d.remark,
+			d.create_date,
+			d.user_id,
+			u.username,
+			u.loginname
+		
+		 from document_inf d inner join user_inf u
+		 where 
+		 	 d.user_id=u.id and d.id=#{id}
+	
+	</select>
+	
+	<update id="update" parameterType="org.deepsl.hrm.domain.Document">
+		update Document_inf set title=#{title},filename=#{fileName},remark=#{remark}
+		where id=#{id}
+	</update>
+	
+	<!-- <select id="selectAllDocument" resultType="org.deepsl.hrm.domain.Document">
+		select * from Document_inf
+	</select>
+	
+	<select id="selectByPage" parameterType="hashmap" resultType="org.deepsl.hrm.domain.Document">
+		select * from Document_inf u
+		<where>
+			<if test="name!=null and username!=''">
+				and u.name = #{name}
+			</if>
+		</where>
+		limit #{size} offset #{firstIndex}
+	</select>
+	
+	<select id="count" resultType="int" parameterType="hashmap">
+		select count(*) from
+		Document_inf u
+		<where>
+			<if test="name!=null and name!=''">
+				and u.name= #{name}
+			</if>
+		</where>
+	</select>
+	
+	<delete id="deleteById" parameterType="int">
+		delete from Document_inf where id = #{id}
+	</delete>
+	
+	
+	<select id="selectById" parameterType="int" resultType="org.deepsl.hrm.domain.Document">
+		select * from Document_inf where id = #{id}
+	
+	</select>
+	
+	<update id="update" parameterType="org.deepsl.hrm.domain.Document">
+		update Document_inf set name=#{name},remark=#{remark}
+		where id=#{id}
+	</update>
+	 -->
+</mapper>

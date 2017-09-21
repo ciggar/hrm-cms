@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.deepsl.hrm.dao.NoticeDao">
+
+
+	<resultMap type="org.deepsl.hrm.domain.Notice" id="noticemap">
+		<id column="id" property="id"/>
+		<result column="title" property="title"/>
+		<result column="content" property="content"/>
+		<result column="create_date" property="createDate"/>
+		
+		
+		<association property="user" javaType="org.deepsl.hrm.domain.User">  
+            <id column="user_id" property="id"/>  
+            <result column="username" property="username"/>
+			<result column="loginname" property="loginname"/>            
+        </association>  
+	</resultMap>
+
+	<select id="save" parameterType="org.deepsl.hrm.domain.Notice">
+		insert into notice_inf (title,content,user_id) values
+		(#{title},#{content},#{user.id})
+	</select>
+
+	<select id="count" resultType="int" parameterType="hashmap">
+		select count(*) from
+		notice_inf u
+		<where>
+			<if test="title!=null and title!=''">
+				and u.title like '%${title}%'
+			</if>
+			
+			<if test="content!=null and content!=''">
+				and u.content like '%${content}%'
+			</if>
+		</where>
+	</select>
+	
+	
+	<select id="selectByPage" parameterType="hashmap" resultMap="noticemap">
+		select 
+			n.id,
+			n.title,
+			n.content,
+			n.create_date,
+			n.user_id,
+			u.username,
+			u.loginname
+			
+			from notice_inf n inner join user_inf u
+		<where>
+			n.`USER_ID`=u.`ID`
+			<if test="title!=null and title!=''">
+				and u.title like '%${title}%'
+			</if>
+			
+			<if test="content!=null and content!=''">
+				and u.content like '%${content}%'
+			</if>
+		</where>
+		limit #{size} offset #{firstIndex}
+	</select>
+	
+	
+	<delete id="deleteById" parameterType="int">
+		delete from notice_inf where id = #{id}
+	</delete>
+	
+	
+	
+	<select id="selectById" parameterType="int" resultMap="noticemap">
+		select 
+			n.id,
+			n.title,
+			n.content,
+			n.create_date,
+			n.user_id,
+			u.username,
+			u.loginname
+			
+			from notice_inf n inner join user_inf u
+		<where>
+			n.`USER_ID`=u.`ID` and n.`ID`=#{id}
+		</where>
+	</select>
+	
+	<update id="update" parameterType="org.deepsl.hrm.domain.Notice">
+		update notice_inf set title=#{title},content=#{content}
+		where id=#{id}
+	</update>
+	
+	
+</mapper>
